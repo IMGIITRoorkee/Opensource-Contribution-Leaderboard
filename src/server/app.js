@@ -301,6 +301,7 @@ const server = http
                                 username,
                                 Config.includedRepositories
                             ).then((result) => {
+                                console.log(result)
                                 if (
                                     result.avatarUrl !== '' &&
                     result.issuesNumber !== -1 &&

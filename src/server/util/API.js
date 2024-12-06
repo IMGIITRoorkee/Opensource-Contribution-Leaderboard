@@ -95,28 +95,8 @@ async function getContributorAvatar(contributor) {
     }
 }
 
-async function getOpenPRsNumber(OpenPRsURL) {
-    const res = await get(APIHOST + OpenPRsURL)
-
-    if (res !== undefined) {
-        return res.data.total_count
-    } else {
-        return -1
-    }
-}
-
-async function getMergedPRsNumber(MergedPRsURL) {
-    const res = await get(APIHOST + MergedPRsURL)
-
-    if (res !== undefined) {
-        return res.data.total_count
-    } else {
-        return -1
-    }
-}
-
 async function getIssuesNumber(IssuesURL) {
-    const res = await get(APIHOST + IssuesURL)
+    const res = await get(APIHOST + IssuesURL, Config.authToken)
 
     if (res !== undefined) {
         return res.data.total_count
@@ -132,40 +112,30 @@ async function getContributorInfo(
 ) {
     const home = BASEURL + '/' + contributor
     const avatarUrl = await getContributorAvatar(contributor)
-    let OpenPRsURL = `/search/issues?q=is:pr+author:${contributor}+is:Open+created:>=${Config.startDate}`
-    let openPRsLink = `${BASEURL}/search?q=type:pr+author:${contributor}+is:open+created:>=${Config.startDate}`
-    let MergedPRsURL = `/search/issues?q=is:pr+author:${contributor}+is:Merged+created:>=${Config.startDate}`
-    let mergedPRsLink = `${BASEURL}/search?q=type:pr+author:${contributor}+is:merged+created:>=${Config.startDate}`
-    let IssuesURL = `/search/issues?q=is:issue+author:${contributor}+created:>=${Config.startDate}`
+    let issuesSolvedLink = `/search/issues?q=is:issue+is:closed+assignee:${contributor}+created:>=${Config.startDate}`
+    let issuesURL = `/search/issues?q=is:issue+author:${contributor}+created:>=${Config.startDate}`
     let issuesLink = `${BASEURL}/search?q=type:issue+author:${contributor}+created:>=${Config.startDate}`
     includedRepositories.forEach((repository) => {
-        openPRsLink += `+repo:${organization}/${repository}`
-        mergedPRsLink += `+repo:${organization}/${repository}`
+        issuesSolvedLink += `+repo:${organization}/${repository}`
         issuesLink += `+repo:${organization}/${repository}`
-
-        OpenPRsURL += `+repo:${organization}/${repository}`
-        MergedPRsURL += `+repo:${organization}/${repository}`
-        IssuesURL += `+repo:${organization}/${repository}`
+        issuesURL += `+repo:${organization}/${repository}`
     })
-    openPRsLink += '+-label:chore'
-    mergedPRsLink += '+-label:chore'
-    issuesLink += '+-label:chore'
-    OpenPRsURL += '+-label:chore'
-    MergedPRsURL += '+-label:chore'
-    IssuesURL += '+-label:chore'
-    const openPRsNumber = await getOpenPRsNumber(OpenPRsURL)
-    const mergedPRsNumber = await getMergedPRsNumber(MergedPRsURL)
-    const issuesNumber = await getIssuesNumber(IssuesURL)
-
+    let easyIssuesSolvedLink = issuesSolvedLink + '+label:easy'
+    let mediumIssuesSolvedLink = issuesSolvedLink + '+label:medium'
+    let hardIssuesSolvedLink = issuesSolvedLink + '+label:hard'
+    const easyIssuesSolved = await getIssuesNumber(easyIssuesSolvedLink)
+    const mediumIssuesSolved = await getIssuesNumber(mediumIssuesSolvedLink)
+    const hardIssuesSolved = await getIssuesNumber(hardIssuesSolvedLink)
+    const issuesNumber = await getIssuesNumber(issuesURL)
+    let totalScore = easyIssuesSolved*15 + mediumIssuesSolved * 30 + hardIssuesSolved * 60 + issuesNumber * 5;
     return {
         home,
         avatarUrl,
-        openPRsNumber,
-        openPRsLink,
-        mergedPRsNumber,
-        mergedPRsLink,
+        easyIssuesSolved,
+        mediumIssuesSolved,
+        hardIssuesSolved,
         issuesNumber,
-        issuesLink,
+        totalScore
     }
 }
 
@@ -236,8 +206,6 @@ async function getRanks(data, parameter = 'mergedprs') {
 module.exports = {
     getRepositories,
     getContributorAvatar,
-    getOpenPRsNumber,
-    getMergedPRsNumber,
     getIssuesNumber,
     getContributorInfo,
     checkRateLimit,
