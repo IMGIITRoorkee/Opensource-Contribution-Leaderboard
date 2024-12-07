@@ -114,10 +114,8 @@ async function getContributorInfo(
     const avatarUrl = await getContributorAvatar(contributor)
     let issuesSolvedLink = `/search/issues?q=is:issue+is:closed+assignee:${contributor}+created:>=${Config.startDate}`
     let issuesURL = `/search/issues?q=is:issue+author:${contributor}+created:>=${Config.startDate}`
-    let issuesLink = `${BASEURL}/search?q=type:issue+author:${contributor}+created:>=${Config.startDate}`
     includedRepositories.forEach((repository) => {
         issuesSolvedLink += `+repo:${organization}/${repository}`
-        issuesLink += `+repo:${organization}/${repository}`
         issuesURL += `+repo:${organization}/${repository}`
     })
     let easyIssuesSolvedLink = issuesSolvedLink + '+label:easy'
@@ -127,7 +125,7 @@ async function getContributorInfo(
     const mediumIssuesSolved = await getIssuesNumber(mediumIssuesSolvedLink)
     const hardIssuesSolved = await getIssuesNumber(hardIssuesSolvedLink)
     const issuesNumber = await getIssuesNumber(issuesURL)
-    let totalScore = easyIssuesSolved*15 + mediumIssuesSolved * 30 + hardIssuesSolved * 60 + issuesNumber * 5;
+    let totalScore = easyIssuesSolved*15 + mediumIssuesSolved * 30 + hardIssuesSolved * 60 + issuesNumber * 5
     return {
         home,
         avatarUrl,

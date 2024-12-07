@@ -50,7 +50,7 @@ async function getAllContributorsInfo() {
 
                 if (Config.contributors.includes(contributor)) {
                     dataBuffer[`${contributor}`] = res
-                    console.log(`${contributor} was updated: ${res.openPRsNumber} ${res.mergedPRsNumber} ${res.issuesNumber}`)
+                    console.log(`${contributor} was updated: ${res.easyIssuesSolved} ${res.mediumIssuesSolved} ${res.hardIssuesSolved} ${res.issuesNumber} ${res.totalScore}`)
 
                     // Update contributors infomation
                     jsonfile.writeFile(dataPath, dataBuffer, { spaces: 2 }, (err) => {

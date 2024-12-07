@@ -4,7 +4,9 @@ const url = require('url')
 const Util = require('./util/Util')
 const API = require('./util/API')
 const fs = require('fs')
-const spawn = require('child_process').spawn
+// spawn - `node refresh.js`
+const { spawn } = require('child_process')
+
 const express = require('express')
 const app = express()
 const proxy = require('http-proxy-middleware')
@@ -25,6 +27,14 @@ const websocketProxyOption = {
     target: 'http://localhost:' + port + '/',
     changeOrigin: true,
 }
+
+const refresh = spawn('node', ['refresh.js'], {
+    shell: true,
+    stdio: 'inherit',
+})
+process.on('exit', () => {
+    refresh.kill() // kill it when exit
+})
 
 Object.defineProperty(Array.prototype, 'flat', {
     value: function (depth = 1) {
@@ -54,14 +64,7 @@ if (!fs.existsSync(admindataPath)) {
     jsonfile.writeFileSync(admindataPath, [])
 }
 
-// spawn - `node refresh.js`
-const refresh = spawn('node', ['refresh.js'], {
-    shell: true,
-    stdio: 'inherit',
-})
-process.on('exit', () => {
-    refresh.kill() // kill it when exit
-})
+
 
 const server = http
     .createServer((req, res) => {
@@ -301,7 +304,6 @@ const server = http
                                 username,
                                 Config.includedRepositories
                             ).then((result) => {
-                                console.log(result)
                                 if (
                                     result.avatarUrl !== '' &&
                     result.issuesNumber !== -1 &&
