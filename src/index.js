@@ -58,13 +58,9 @@ function refreshTable(newData) {
         // Username with rank
         const tdUsername = document.createElement('td')
         const usernameLink = document.createElement('a')
-        const rank = document.createElement('span')
         usernameLink.href = contributor.home
         usernameLink.innerText = contributor.username
-        rank.innerText = ` (#${index + 1})`
-        rank.style.marginLeft = '10px'
         tdUsername.appendChild(usernameLink)
-        tdUsername.appendChild(rank)
         tr.appendChild(tdUsername)
 
         // Easy Issues Solved
