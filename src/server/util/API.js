@@ -112,7 +112,7 @@ async function getContributorInfo(
 ) {
     const home = BASEURL + '/' + contributor
     const avatarUrl = await getContributorAvatar(contributor)
-    let issuesSolvedLink = `/search/issues?q=is:issue+is:closed+assignee:${contributor}+created:>=${Config.startDate}`
+    let issuesSolvedLink = `/search/issues?q=is:issue+is:closed+assignee:${contributor}`
     let issuesURL = `/search/issues?q=is:issue+author:${contributor}+created:>=${Config.startDate}`
     includedRepositories.forEach((repository) => {
         issuesSolvedLink += `+repo:${organization}/${repository}`
